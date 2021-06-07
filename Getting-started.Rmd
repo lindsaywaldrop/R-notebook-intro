@@ -9,27 +9,36 @@ Markdown, in general, is a simplified formatting language designed to easily cre
 
 At the base of markdown is the idea of ``literate programming'', or the idea that code producing results should be embedded in a human-readable explanation of each step of that analysis. Markdown makes it easy to embed code directly into a document, therefore making your analysis fully understandable and reproducible.
 
-R Markdown is a special type of markdown that is designed to work specifically with R and RStudio. You can install R Markdown by running the following bit of code: 
-
-```{r}
-install.packages("rmarkdown")
-```
-
-Note that R Markdown comes pre-installed in RStudio!
+R Markdown is a special type of markdown that is designed to work specifically with R and RStudio. R Markdown comes pre-installed in RStudio!
 
 Load the full library by running: 
 ```{r} 
 library(rmarkdown)
 ```
 
-## Template instructions from RStudio:
+To get started, simply open the R Project "IntroLabR.Rproj" in RStudio. You'll notice a few files in this folder: 
+ 
+ * R-notebook-intro.Rproj is the R Project file which will help RStudio organize what R does, including setting the working directory.
+ * Getting-started.Rmd is the R Markdown file you will use to produce the file you will turn in. 
+ * Getting-started.nb.html is the rendered product of the above Rmd file. 
+ * babycrab1.csv is a data file (in comma-separative value, or CSV, format) which contains some sample data to practice loading and plotting. 
 
-This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+To generate an HTML notebook file, simply click "Preview" at the top of the script editing window. 
 
-Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
 
-```{r}
-plot(cars,col="red",pch=21)
+### Formatting Text
+
+In Markdown, you format text with simple commands, similar to the way HTML formats text. You can do most things to text that you would be able to do in MS Word, including: __bold__, _italics_, `verbatim code`, ^superscript^, ~subscript~, ~~strikeout~~, or an equation: $y=mx+b$. 
+
+A useful Cheat Sheet from RStudio can be found at <https://rmarkdown.rstudio.com/lesson-15.html>. 
+
+### Inserting Code and Plots
+
+The most useful part of R Markdown documents is the ability to directly insert code and the output into a document. This way, you can explain what you are doing and then _do it_ in a way that is fully reproducible! 
+
+As an example, here is the R data set `cars` plotted below. (Cars is a data set that is already loaded with R.) You must run the below chunk of code before it will show up in your document.
+```{r, echo=TRUE}
+plot(cars)
 ```
 
 Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
@@ -38,9 +47,47 @@ When you save the notebook, an HTML file containing the code and output will be 
 
 The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
 
-## A Sample Analysis!
+Next, we'll load some data from the file babycrab1.csv: 
+```{r, echo=TRUE}
+# A hashtag will "comment" a line of code, in other words, the computer will ignore everything after this mark. 
+# These are useful for making notes in case you need them. 
 
-We'll do an analysis on babycrab1.csv in lab meeting! 
+crab.data <- read.csv("babycrab2.csv") # loads data
+summary(crab.data) # produces summary statistics
+```
+After running this code chunk, you'll notice that "crab.data" appears in your environment and a summary of each column of the data set appears below the code chunk. This data set is a set of measurements on 20 juvenile shore crabs, including their carapace length (size in mm), length and diameter of their chemosensory hairs (aesthetascs), the thickness of the cuticle of these hairs, and the entire width of their chemosensory array.  
+
+Here is a sample plot of the Aesthetasc diameter versus the crab size: 
+```{r, echo=TRUE}
+plot(x = crab.data$size.mm, y = crab.data$Aes.diameter.m)
+ #plot(Aes.diameter.m~size.mm, data=crab.data) #Alternative way of plotting, this produces the same plot!
+```
+
+We can also work with the labels and points very easily to update them from the default: 
+```{r, echo=TRUE}
+plot(x = crab.data$size.mm, y = crab.data$Aes.diameter.m,
+     xlab = "Carapace width (mm)", ylab = "Aesthetasc diameter (m)", 
+     pch = 21, bg = "red")
+```
+
+If we wanted to do a linear regression on these data, we can do it easily with the following command: 
+```{r, echo=TRUE}
+lm.crab1<-lm(Aes.diameter.m~size.mm, data=crab.data) # Creates the linear model
+lm.crab2<-summary(lm.crab1)
+summary(lm.crab1) # reports the results
+```
+
+We can see that there is a significant relationship between the two ($p = `r signif(lm.crab2$coefficients[2,4],digits=1)`$). (<- You can see that I'm able to pull the exact number from the analysis, so if I re-run it, the number will stay correct!) Here, the p-value of relevance is for the slope (size.mm) under the Pr(>|t|) column. That corresponds to `lm.crab2$coefficients[2,4]`.
+
+After we have calculated the linear model `lm.crab1`, we can add a regression line to our plot: 
+```{r echo=TRUE}
+plot(x = crab.data$size.mm, y = crab.data$Aes.diameter.m,
+     xlab = "Carapace width (mm)", ylab = "Aesthetasc diameter (m)", 
+     pch = 21, bg = "red")
+abline(lm.crab1, col = "red")
+```
+
+
 
 # Other helpful stuff
 
@@ -50,4 +97,4 @@ We'll do an analysis on babycrab1.csv in lab meeting!
  - R Markdown Guide book: https://bookdown.org/yihui/rmarkdown/
  - See the reference guide in this directory by RStudio: rmarkdown-reference.pdf
  - See the Cheat Sheet by R Markdown in this directory: rmarkdown-cheatsheet-2.0.pdf 
- - 
+
